@@ -25,12 +25,15 @@
 
 (defn mock-mods [[sym fake]]
   (let [fake-vec (vec fake)
+        fake-call (nth fake 1)
+        fake-args (if (list? fake-call) (rest fake-call) '())
+        args-call (cons 'midje.cljs.core/set-arg-list! fake-args) 
         fake-cnt (count fake-vec)
         fake-ret (list (fake-arrows (nth fake 2)) (nth fake 3))
         fake-mods (when (= fake-cnt 6) (list (fake-mods (nth fake 4)) (nth fake 5)))]
     (if fake-mods
-      (list 'clojure.core/-> (list sym) fake-ret fake-mods)
-      (list 'clojure.core/-> (list sym) fake-ret))))
+      (list 'clojure.core/-> (list sym) fake-ret args-call fake-mods)
+      (list 'clojure.core/-> (list sym) fake-ret args-call))))
 
 (defn mock-verified [sym]
   (list (symbol ".$verify") sym))

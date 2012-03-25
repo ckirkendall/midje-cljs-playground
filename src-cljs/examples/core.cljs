@@ -6,12 +6,16 @@
   (:use-macros [midje.cljs.semi-sweet :only [expect fact run-tests]]
                [midje.cljs.sweet :only [fact provided]]))
 
-   
-(defn world [] "world")
+
+(defn world 
+  ([] (world nil))
+  ([arg] (if arg arg "world")))
 
 (defn world2 [] "my world")
  
-(defn hello [] (str "hello " (world))) 
+(defn hello  
+  ([] (str "hello " (world)))
+  ([arg] (str "hello " (world arg)))) 
 
 (defn hello2 [] (str "hello " (world) " hello " (world)))
 
@@ -22,7 +26,7 @@
   (fake (examples.core/world) => "test" :times 2))
         
 (fact "testing2"
-  (hello2) => "hello test hello test"
+  (do (hello) (hello)) => "hello test"
   (provided (examples.core/world) => "test" :times 2)) 
 
 (fact "testing3" ;=>should fail
@@ -41,6 +45,11 @@
             (examples.core/world2) => "test2")
   (hello) =not=> "hello world"
   (provided (examples.core/world) => "test")) 
+
+(fact "testing5"
+      (hello "test") => "hello test"
+      (provided
+        (examples.core/world "test") => "test"))
 
 (set! (.-onload js/window) run-test)
  
